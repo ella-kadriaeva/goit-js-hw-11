@@ -4,7 +4,7 @@ body {
   line-height: 1.5;
   background-color: #fff;
   color: #424242;
-  max-width: 960px;
+  max-width: 100%;
   padding: 16px;
 }
 
@@ -21,13 +21,4 @@ body {
   display: flex;
   justify-content: center;
   padding: 10px;
-
 }
-
-// .example .background {
-//   height: 240px;
-//   // Путь к изображениям из SASS-файла всегда такой, как из папки css
-//   background-image: url('../images/demo.jpg');
-//   background-size: cover;
-//   background-position: center;
-// }
