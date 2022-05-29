@@ -22,3 +22,16 @@ body {
   justify-content: center;
   padding: 10px;
 }
+.load-more {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.load-more.is-hidden {
+  display: none;
+}
+
+.load-more > .spinner.is-hidden {
+  display: none;
+}

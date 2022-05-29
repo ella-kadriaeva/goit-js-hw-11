@@ -2,52 +2,36 @@ import './sass/main.scss';
 import Notiflix from 'notiflix';
 // import SimpleLightbox from "simplelightbox";
 // const axios = require('axios');
-
-const BASE_URL = 'https://pixabay.com/api/';
-const searchParams = new URLSearchParams({
-    key: '27669680-6a77b114183598540616a731d',
-    image_type: 'photo',
-    orientation: 'horizontal',
-    safesearch: true,
-    per_page: 40,
-    });
+import GalleryApiService from './api-service.js';
 
 const searchForm = document.querySelector('#search-form');
 const galleryCard = document.querySelector(".gallery");
+const buttonLoad = document.querySelector('.load-more');
+const createGallery = new GalleryApiService();
 
 searchForm.addEventListener('submit', getSearch);
+buttonLoad.addEventListener('click', onLoadMore);
 
 function getSearch(e) {
  e.preventDefault();
  const form = e.currentTarget;
- const searchValue = form.elements.searchQuery.value.trim();
-
- if(searchValue === '') {
+ createGallery.query = form.elements.searchQuery.value.trim();
+ if(createGallery.query === '') {
      return
  }
- fetchGallery(searchValue).then(renderGallery).then(createGalery)
+createGallery.fetchGallery().then(renderGallery).then(newGalery)
  
 }
-function fetchGallery(value) {
-    return fetch(`${BASE_URL}?${searchParams}&q=${value}`).then(response => {
-     if(response.ok) {
-         console.log('ok');
-           return response.json();
-     }
-      throw new Error('Error fetching data')
-    });
-  }
 
-function renderGallery(data) {
+function renderGallery(array) {
    
-    console.log(data.total, data.totalHits, data,  data.hits);
-
-    const array =  data.hits;
-    if(array.length === 0) {
+const newArray = array.hits;
+    if(newArray.length === 0) {
        Notiflix.Notify.warning('Sorry, there are no images matching your search query. Please try again.');
        return
     }
-    return array.map(({previewURL, tags, likes, views, comments, downloads}) => {
+    
+    return newArray.map(({previewURL, tags, likes, views, comments, downloads}) => {
         return `
     
     <div class="photo-card">
@@ -64,7 +48,7 @@ function renderGallery(data) {
           <b>Comments</b>: ${comments}
         </p>
         <p class="info-item">
-          <b>Downloads</b>:${downloads}
+          <b>Downloads</b>: ${downloads}
         </p>
       </div>
     </div>
@@ -73,6 +57,10 @@ function renderGallery(data) {
     .join("");
     
 }
-function createGalery (array) {
+function newGalery (array) {
   return  galleryCard.insertAdjacentHTML("beforeend", array);
 } 
+
+function onLoadMore() { 
+  return  createGallery.fetchGallery().then(renderGallery).then(newGalery)
+}
