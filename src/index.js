@@ -1,7 +1,5 @@
 import './sass/main.scss';
 import Notiflix from 'notiflix';
-// import SimpleLightbox from "simplelightbox";
-// const axios = require('axios');
 import GalleryApiService from './api-service.js';
 
 const searchForm = document.querySelector('#search-form');
@@ -19,7 +17,7 @@ function getSearch(e) {
  if(createGallery.query === '') {
      return
  }
-createGallery.fetchGallery().then(renderGallery).then(newGalery)
+ createGallery.fetchGallery().then(renderGallery).then(newGalery)
  
 }
 
@@ -33,7 +31,6 @@ const newArray = array.hits;
     
     return newArray.map(({previewURL, tags, likes, views, comments, downloads}) => {
         return `
-    
     <div class="photo-card">
         <img class="gallery__image" src="${previewURL}" alt="${tags}" max-width="320px"height="200px" loading="lazy" />
      
