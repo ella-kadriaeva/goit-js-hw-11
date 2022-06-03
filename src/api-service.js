@@ -12,19 +12,17 @@ const axios = require('axios').default;
 
 export default class GalleryApiService {
 constructor() {
-  this.query = '';
+  this.searchQuery = '';
   this.page = 1;
 }
 
 async fetchGallery() {
-  const url = `${BASE_URL}?q=${this.query}&${searchParams}&page=${this.page}`;
+  const url = `${BASE_URL}?q=${this.searchQuery}&${searchParams}&page=${this.page}`;
   try {
   const response = await axios.get(url);
   const data = response.data;
-   
-  console.log('ok');
-  console.log(data);
-      this.incrementPage();
+  
+  this.incrementPage();
       return data;
     } catch (error) {
       console.error(error);

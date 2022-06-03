@@ -7,28 +7,56 @@ const galleryCard = document.querySelector(".gallery");
 const buttonLoad = document.querySelector('.load-more');
 const createGallery = new GalleryApiService();
 
+const per_page = 40;
+
+
 searchForm.addEventListener('submit', getSearch);
 buttonLoad.addEventListener('click', onLoadMore);
+buttonLoad.classList.add("is-hidden");
 
-function getSearch(e) {
+async function getSearch(e) {
  e.preventDefault();
+ createGallery.resetPage();
+ clearCard ();
  const form = e.currentTarget;
  createGallery.query = form.elements.searchQuery.value.trim();
+
  if(createGallery.query === '') {
      return
  }
- createGallery.fetchGallery().then(renderGallery).then(newGalery)
+
+ const data = await createGallery.fetchGallery();
+ checkTotal(data);
  
+ }
+
+ function clearCard () {
+  galleryCard.innerHTML = "";
+ }
+ 
+
+async function checkTotal(data) {
+  const newArray = await data.hits;
+  if(newArray.length === 0) {
+    Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.');
+    return 
+   }
+  const totalHits = data.totalHits;
+  let delta = totalHits - per_page * createGallery.page; 
+    if(delta <= per_page) {
+     buttonLoad.classList.add("is-hidden");
+     newGalery (data);
+     Notiflix.Notify.info("We're sorry, but you've reached the end of search results.");
+    return
+ }
+ buttonLoad.classList.remove("is-hidden");
+ return newGalery(data);
 }
 
-function renderGallery(array) {
+async function renderGallery(array) {
    
-const newArray = array.hits;
-    if(newArray.length === 0) {
-       Notiflix.Notify.warning('Sorry, there are no images matching your search query. Please try again.');
-       return
-    }
-    
+const newArray = await array.hits;
+   
     return newArray.map(({previewURL, tags, likes, views, comments, downloads}) => {
         return `
     <div class="photo-card">
@@ -54,10 +82,15 @@ const newArray = array.hits;
     .join("");
     
 }
-function newGalery (array) {
-  return  galleryCard.insertAdjacentHTML("beforeend", array);
+async function newGalery (data) {
+  const markup = await renderGallery(data);
+  return  galleryCard.insertAdjacentHTML("beforeend", markup);
 } 
-
-function onLoadMore() { 
-  return  createGallery.fetchGallery().then(renderGallery).then(newGalery)
+async function onLoadMore() {
+  const data = await createGallery.fetchGallery();
+ checkTotal(data);
 }
+
+
+
+
