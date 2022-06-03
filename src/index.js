@@ -26,6 +26,8 @@ async function getSearch(e) {
  }
 
  const data = await createGallery.fetchGallery();
+ const totalHits = data.totalHits;
+ Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
  checkTotal(data);
  
  }
@@ -42,6 +44,7 @@ async function checkTotal(data) {
     return 
    }
   const totalHits = data.totalHits;
+ 
   let delta = totalHits - per_page * createGallery.page; 
     if(delta <= per_page) {
      buttonLoad.classList.add("is-hidden");
