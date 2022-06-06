@@ -87,8 +87,7 @@ const newArray = await array.hits;
     </div>
     `
     })
-    .join("");
-    
+    .join("");    
 }
 
 
