@@ -1,6 +1,8 @@
 import './sass/main.scss';
 import Notiflix from 'notiflix';
 import GalleryApiService from './api-service.js';
+import SimpleLightbox from "simplelightbox";
+import "simplelightbox/dist/simple-lightbox.min.css";
 
 const searchForm = document.querySelector('#search-form');
 const galleryCard = document.querySelector(".gallery");
@@ -9,10 +11,11 @@ const createGallery = new GalleryApiService();
 
 const per_page = 40;
 
-
 searchForm.addEventListener('submit', getSearch);
 buttonLoad.addEventListener('click', onLoadMore);
 buttonLoad.classList.add("is-hidden");
+
+
 
 async function getSearch(e) {
  e.preventDefault();
@@ -45,8 +48,9 @@ async function checkTotal(data) {
    }
   const totalHits = data.totalHits;
  
-  let delta = totalHits - per_page * createGallery.page; 
-    if(delta <= per_page) {
+  let delta = totalHits - per_page  * (createGallery.page - 1); 
+    if(delta <= 0) {
+      console.log(delta);
      buttonLoad.classList.add("is-hidden");
      newGalery (data);
      Notiflix.Notify.info("We're sorry, but you've reached the end of search results.");
@@ -60,11 +64,12 @@ async function renderGallery(array) {
    
 const newArray = await array.hits;
    
-    return newArray.map(({previewURL, tags, likes, views, comments, downloads}) => {
+    return newArray.map(({webformatURL, tags, likes, views, comments, downloads, largeImageURL}) => {
         return `
     <div class="photo-card">
-        <img class="gallery__image" src="${previewURL}" alt="${tags}" max-width="320px"height="200px" loading="lazy" />
-     
+    <a class="gallery__link" href="${largeImageURL}">
+        <img class="gallery__image" src="${webformatURL}" alt="${tags}"  max-width="320px"height="200px" loading="lazy" />
+    </a> 
       <div class="info">
         <p class="info-item">
           <b>Likes</b>: ${likes}
@@ -85,11 +90,21 @@ const newArray = await array.hits;
     .join("");
     
 }
+
+
 async function newGalery (data) {
+  
   const markup = await renderGallery(data);
-  return  galleryCard.insertAdjacentHTML("beforeend", markup);
+   galleryCard.insertAdjacentHTML("beforeend", markup);
+   const lightbox = new SimpleLightbox('.gallery a', {
+    captionsData: 'alt',
+    captionDelay: 250,
+    close: false,
+   });
+    lightbox.refresh();
 } 
 async function onLoadMore() {
+  
   const data = await createGallery.fetchGallery();
  checkTotal(data);
 }
